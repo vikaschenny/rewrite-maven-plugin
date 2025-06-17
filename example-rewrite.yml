@@ -1,0 +1,93 @@
+# Example OpenRewrite configuration file
+# This demonstrates how to configure the rewrite-go tool
+
+type: specs.openrewrite.org/v1beta/recipe
+name: example.ProjectCleanup
+displayName: Project Cleanup Recipe
+description: A comprehensive recipe to clean up and modernize code
+
+# List of recipes to activate
+recipeList:
+  # Java recipes
+  - org.openrewrite.java.format.AutoFormat
+  - org.openrewrite.java.RemoveUnusedImports
+  - org.openrewrite.java.OrderImports
+  - org.openrewrite.java.cleanup.CommonDeclarationSiteTypeVariances
+  - org.openrewrite.java.cleanup.RemoveUnusedLocalVariables
+  - org.openrewrite.java.cleanup.RemoveUnusedPrivateFields
+  
+  # XML/Maven recipes
+  - org.openrewrite.maven.cleanup.PomCleanup
+  - org.openrewrite.xml.format.AutoFormat
+  
+  # General cleanup
+  - org.openrewrite.text.FindAndReplace
+
+# List of styles to activate
+styleList:
+  - org.openrewrite.java.IntelliJ
+  - org.openrewrite.java.GoogleJavaFormat
+
+# Custom recipe definitions
+recipes:
+  - name: example.RemoveDeprecatedAnnotations
+    displayName: Remove Deprecated Annotations
+    description: Remove @Deprecated annotations from code
+    # This would contain the actual recipe logic
+    
+  - name: example.UpdateCopyrightHeaders
+    displayName: Update Copyright Headers
+    description: Standardize copyright headers across all files
+
+# Custom style definitions
+styles:
+  - name: example.CompanyCodeStyle
+    displayName: Company Code Style
+    # Style configuration would go here
+
+# File patterns to exclude from processing
+exclusions:
+  - "**/target/**"
+  - "**/build/**"
+  - "**/.git/**"
+  - "**/.svn/**"
+  - "**/node_modules/**"
+  - "**/.idea/**"
+  - "**/.vscode/**"
+  - "**/bin/**"
+  - "**/obj/**"
+
+# Additional plain text file patterns to process
+additionalPlainTextMasks:
+  - "**/*.dockerfile"
+  - "**/*.jenkinsfile"
+  - "**/Makefile"
+  - "**/.gitignore"
+  - "**/.dockerignore"
+
+# Configuration options
+sizeThresholdMb: 10
+pomCacheEnabled: true
+checkstyleDetectionEnabled: true
+failOnInvalidActiveRecipes: false
+resolvePropertiesInYaml: true
+
+# Recipe-specific configuration
+# This section would contain configuration for specific recipes
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.text.FindAndReplace
+config:
+  find: "TODO"
+  replace: "FIXME"
+  regex: false
+
+---
+type: specs.openrewrite.org/v1beta/style
+name: org.openrewrite.java.IntelliJ
+config:
+  # IntelliJ style configuration
+  useTabCharacter: false
+  tabSize: 4
+  indentSize: 4
+  continuationIndent: 8 

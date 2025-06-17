@@ -1,161 +1,264 @@
-<p align="center">
-  <a href="https://docs.openrewrite.org">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/openrewrite/rewrite/raw/main/doc/logo-oss-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="https://github.com/openrewrite/rewrite/raw/main/doc/logo-oss-light.svg">
-      <img alt="OpenRewrite Logo" src="https://github.com/openrewrite/rewrite/raw/main/doc/logo-oss-light.svg" width='600px'>
-    </picture>
-  </a>
-</p>
+# Rewrite-Go
 
-<div align="center">
-  <h1>rewrite-maven-plugin</h1>
-</div>
+A Go implementation of the OpenRewrite Maven plugin that applies code transformation recipes to your projects.
 
-<div align="center">
+This tool provides similar functionality to the Maven rewrite plugin, allowing you to apply various code transformation recipes to source code written in multiple languages.
 
-<!-- Keep the gap above this line, otherwise they won't render correctly! -->
-[![ci](https://github.com/openrewrite/rewrite-maven-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/openrewrite/rewrite-maven-plugin/actions/workflows/ci.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/org.openrewrite.maven/rewrite-maven-plugin.svg)](https://mvnrepository.com/artifact/org.openrewrite.maven/rewrite-maven-plugin)
-[![Contributing Guide](https://img.shields.io/badge/Contributing-Guide-informational)](https://github.com/openrewrite/.github/blob/main/CONTRIBUTING.md)
-</div>
+## Conversion from Java Maven Plugin
 
-## What is this?
+This Go version mirrors the structure and functionality of the original Java Maven plugin:
 
-This project provides a Maven plugin that applies [Rewrite](https://github.com/openrewrite/rewrite) checking and fixing tasks as build tasks, one of several possible workflows for propagating change across an organization's source code.
+- **ConfigurableRewriteMojo** → `config.go` - Configuration management and parameter handling
+- **AbstractRewriteMojo** → `rewriter.go` - Core rewrite engine and environment setup
+- **AbstractRewriteRunMojo** → `runner.go` - Execution logic and file operations
+- **Maven Plugin Annotations** → `main.go` - CLI interface using Cobra
 
-## Getting started
+## Features
 
-This `README` may not have the most up-to-date documentation. For the most up-to-date documentation and reference guides, see:
+- ✅ Configuration via YAML files
+- ✅ Command-line interface with multiple subcommands
+- ✅ Dry-run capability to preview changes
+- ✅ Support for multiple file types and patterns
+- ✅ Recipe and style management
+- ✅ File exclusion patterns
+- ✅ Size threshold filtering
+- ✅ Environment variable support
+- ⚠️ Recipe application logic (placeholder - needs actual OpenRewrite recipe implementation)
 
-- [Auto-generated maven plugin documentation](https://openrewrite.github.io/rewrite-maven-plugin/plugin-info.html)
-- [Maven Plugin Configuration](https://docs.openrewrite.org/reference/rewrite-maven-plugin)
-- [OpenRewrite Quickstart Guide](https://docs.openrewrite.org/running-recipes/getting-started)
+## Installation
 
-To configure, add the plugin to your POM:
+```bash
+# Clone the repository
+git clone https://github.com/openrewrite/rewrite-go
+cd rewrite-go
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-    ...
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.openrewrite.maven</groupId>
-                <artifactId>rewrite-maven-plugin</artifactId>
-                <version><!-- latest version here --></version>
-                <configuration>
-                    <activeRecipes>
-                        <recipe>org.openrewrite.java.format.AutoFormat</recipe>
-                    </activeRecipes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+# Build the binary
+go build -o rewrite-go
+
+# Install globally (optional)
+go install
 ```
 
-If wanting to leverage recipes from other dependencies:
+## Usage
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-    ...
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.openrewrite.maven</groupId>
-                <artifactId>rewrite-maven-plugin</artifactId>
-                <version><!-- latest version here --></version>
-                <configuration>
-                    <activeRecipes>
-                        <recipe>org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe>
-                        <recipe>org.openrewrite.github.ActionsSetupJavaAdoptOpenJDKToTemurin</recipe>
-                    </activeRecipes>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.openrewrite.recipe</groupId>
-                        <artifactId>rewrite-testing-frameworks</artifactId>
-                        <version><!-- latest dependency version here --></version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.openrewrite.recipe</groupId>
-                        <artifactId>rewrite-github-actions</artifactId>
-                        <version><!-- latest dependency version here --></version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+### Basic Commands
+
+```bash
+# Run recipes and apply changes
+./rewrite-go run
+
+# Preview changes without applying (dry run)
+./rewrite-go dry-run
+
+# List available recipes
+./rewrite-go discover
+
+# Show help
+./rewrite-go --help
+
+# Show version
+./rewrite-go version
 ```
 
-To get started, try `mvn rewrite:help`, `mvn rewrite:discover`, `mvn rewrite:dryRun`, `mvn rewrite:run`, among other plugin goals.
+### Configuration Options
 
-See the [Maven Plugin Configuration](https://docs.openrewrite.org/reference/rewrite-maven-plugin) documentation for full configuration and usage options.
+```bash
+# Use a custom configuration file
+./rewrite-go run --config custom-rewrite.yml
 
-### Snapshots
+# Specify active recipes via command line
+./rewrite-go run --active-recipes "Recipe1,Recipe2,Recipe3"
 
-To use the latest `-SNAPSHOT` version, add a `<pluginRepositories>` entry for OSSRH snapshots. For example:
+# Specify active styles
+./rewrite-go run --active-styles "Style1,Style2"
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-    ...
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.openrewrite.maven</groupId>
-                <artifactId>rewrite-maven-plugin</artifactId>
-                <!-- Use whichever version is latest at the time of reading. This number is a placeholder. -->
-                <version>4.17.0-SNAPSHOT</version>
-                <configuration>
-                    <activeRecipes>
-                        <recipe>org.openrewrite.java.logging.slf4j.Log4j2ToSlf4j</recipe>
-                    </activeRecipes>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.openrewrite.recipe</groupId>
-                        <artifactId>rewrite-testing-frameworks</artifactId>
-                        <!-- Use whichever version is latest at the time of reading. This number is a placeholder. -->
-                        <version>1.1.0-SNAPSHOT</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        </plugins>
-    </build>
+# Run on a specific directory
+./rewrite-go run --base-dir /path/to/project
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>ossrh-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </pluginRepository>
-    </pluginRepositories>
+# Verbose output
+./rewrite-go run --verbose
 
-</project>
+# Skip execution
+./rewrite-go run --skip
 ```
 
-## Notes for developing and testing this plugin
+### Configuration File
 
-This plugin uses the [`Maven Integration Testing Framework Extension`](https://github.com/khmarbaise/maven-it-extension) for tests.
+Create a `rewrite.yml` file in your project root:
 
-All tests can be run from the command line using:
+```yaml
+# Example rewrite.yml configuration
+type: specs.openrewrite.org/v1beta/recipe
+name: example.MyRecipe
+displayName: My Custom Recipe
+description: An example recipe configuration
 
-```sh
-./mvnw verify
+# Recipe list - recipes to activate
+recipeList:
+  - org.openrewrite.java.format.AutoFormat
+  - org.openrewrite.java.RemoveUnusedImports
+  - org.openrewrite.java.OrderImports
+
+# Style list - styles to activate  
+styleList:
+  - org.openrewrite.java.IntelliJ
+
+# Recipe definitions
+recipes:
+  - name: example.CustomRule
+    displayName: Custom Rule
+    description: A custom transformation rule
+    # Recipe-specific configuration would go here
+
+# Style definitions
+styles:
+  - name: example.CustomStyle
+    # Style-specific configuration would go here
+
+# Global configuration
+excludes:
+  - "**/target/**"
+  - "**/build/**"
+  - "**/.git/**"
+
+plainTextMasks:
+  - "**/*.txt"
+  - "**/*.md"
+  - "**/*.json"
+
+sizeThresholdMb: 10
+pomCacheEnabled: true
+checkstyleDetectionEnabled: true
 ```
 
-If you're looking for more information on the output from a test, try checking the `target/maven-it/**/*IT/**` directory contents after running the tests. It will contain the project state output, including maven logs, etc. Check the [`Integration Testing Framework Users Guide`](https://khmarbaise.github.io/maven-it-extension/itf-documentation/usersguide/usersguide.html) for information, too. It's good.
+### Environment Variables
+
+You can configure the tool using environment variables with the `REWRITE_` prefix:
+
+```bash
+export REWRITE_CONFIG_LOCATION=custom-config.yml
+export REWRITE_ACTIVE_RECIPES=Recipe1,Recipe2
+export REWRITE_SKIP=true
+export REWRITE_LOG_LEVEL=debug
+
+./rewrite-go run
+```
+
+## File Support
+
+The tool automatically detects and processes various file types:
+
+**Source Code Files:**
+- Java (`.java`)
+- Kotlin (`.kt`)
+- Groovy (`.groovy`)
+- Scala (`.scala`)
+- JavaScript/TypeScript (`.js`, `.ts`, `.jsx`, `.tsx`)
+- Go (`.go`)
+- Rust (`.rs`)
+- Python (`.py`)
+- Ruby (`.rb`)
+- C/C++ (`.c`, `.cpp`, `.h`, `.hpp`)
+- C# (`.cs`)
+- PHP (`.php`)
+
+**Configuration Files:**
+- XML (`.xml`)
+- JSON (`.json`)
+- YAML (`.yaml`, `.yml`)
+- Properties (`.properties`)
+- TOML (`.toml`)
+- HCL (`.hcl`)
+
+**Plain Text Files:**
+- Markdown (`.md`)
+- Text (`.txt`)
+- Shell scripts (`.sh`, `.bash`)
+- Batch files (`.bat`)
+- Dockerfiles
+- And many more (see `config.go` for full list)
+
+## Architecture
+
+The Go version follows the same architectural patterns as the Java Maven plugin:
+
+### Core Components
+
+1. **Config (`config.go`)** - Configuration management
+   - YAML configuration loading
+   - Command-line parameter handling
+   - Environment variable support
+   - Default value management
+
+2. **Rewriter (`rewriter.go`)** - Core transformation engine
+   - Environment setup and recipe loading
+   - File discovery and filtering
+   - Recipe application (placeholder for actual OpenRewrite integration)
+   - Result processing
+
+3. **Runner (`runner.go`)** - Execution management
+   - Dry-run vs. actual execution
+   - File writing and backup operations
+   - Progress reporting and logging
+   - Error handling
+
+4. **Main (`main.go`)** - CLI interface
+   - Command-line parsing using Cobra
+   - Configuration initialization
+   - Subcommand routing
+
+### Maven Plugin Equivalents
+
+| Java Class | Go File | Purpose |
+|------------|---------|---------|
+| `ConfigurableRewriteMojo` | `config.go` | Configuration and parameters |
+| `AbstractRewriteMojo` | `rewriter.go` | Core rewrite functionality |
+| `AbstractRewriteRunMojo` | `runner.go` | Execution logic |
+| `RewriteRunMojo` | CLI run command | Execute recipes |
+| `RewriteDryRunMojo` | CLI dry-run command | Preview changes |
+| `RewriteDiscoverMojo` | CLI discover command | List recipes |
+
+## Development Status
+
+This is a conversion/port of the Java Maven plugin to Go. The structure and interfaces are complete, but the actual recipe application logic is currently a placeholder.
+
+### What's Implemented ✅
+
+- Complete CLI interface with all major commands
+- Configuration file loading and management
+- File discovery and filtering
+- Dry-run functionality
+- Result categorization and reporting
+- File writing and directory cleanup
+- Environment variable support
+- Error handling and logging
+
+### What Needs Implementation ⚠️
+
+- Actual OpenRewrite recipe execution engine
+- AST parsing and transformation for different languages
+- Integration with OpenRewrite recipe ecosystem
+- Recipe artifact resolution and loading
+- Checkstyle configuration parsing
+- Maven POM parsing (if needed)
 
 ## Contributing
 
-We appreciate all types of contributions. See the [contributing guide](https://github.com/openrewrite/.github/blob/main/CONTRIBUTING.md) for detailed instructions on how to get started.
+This is a faithful port of the Java Maven plugin. When implementing new features or fixing bugs, please refer to the original Java implementation to maintain compatibility.
 
-### Resource guides
+### Key Design Principles
 
-- https://blog.soebes.io/posts/2020/08/2020-08-17-itf-part-i/
-- https://carlosvin.github.io/posts/creating-custom-maven-plugin/en/#_dependency_injection
-- https://developer.okta.com/blog/2019/09/23/tutorial-build-a-maven-plugin
-- https://medium.com/swlh/step-by-step-guide-to-developing-a-custom-maven-plugin-b6e3a0e09966
+1. **Maintain API Compatibility** - Configuration options and behavior should match the Maven plugin
+2. **Preserve Structure** - The Go code mirrors the Java class hierarchy and responsibilities
+3. **Idiomatic Go** - While maintaining compatibility, use Go best practices and idioms
+4. **Cross-Platform** - Ensure the tool works on Windows, macOS, and Linux
+
+## License
+
+This project follows the same license as the original OpenRewrite Maven plugin.
+
+## Links
+
+- [Original OpenRewrite Maven Plugin](https://github.com/openrewrite/rewrite-maven-plugin)
+- [OpenRewrite Documentation](https://docs.openrewrite.org/)
+- [OpenRewrite Recipes](https://docs.openrewrite.org/recipes)
