@@ -1,18 +1,18 @@
 ---
 name: ci
 
-on:
-  push:
-    branches:
-      - main
-    tags-ignore:
-      - "*"
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch: {}
-  schedule:
-    - cron: 0 17 * * *
+# on:
+#   push:
+#     branches:
+#       - main
+#     tags-ignore:
+#       - "*"
+  # pull_request:
+  #   branches:
+  #     - main
+  # workflow_dispatch: {}
+  # schedule:
+  #   - cron: 0 17 * * *
 
 env:
   GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.gradle_enterprise_cache_username }}
